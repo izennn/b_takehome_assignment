@@ -27,6 +27,10 @@ dependencies {
     implementation("io.quarkus:quarkus-resteasy-reactive")
     // javax
     implementation("jakarta.ws.rs:jakarta.ws.rs-api:3.1.0")
+    // logging
+    implementation("org.slf4j:slf4j-api:2.0.3")
+    implementation("ch.qos.logback:logback-classic:1.4.4")
+    implementation("ch.qos.logback:logback-core:1.4.4")
     // testing
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
