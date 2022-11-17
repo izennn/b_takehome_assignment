@@ -1,6 +1,6 @@
 package com.bullish.checkout.adapters.input.rest
 
-import com.bullish.checkout.domain.models.Basket
+import com.bullish.checkout.domain.models.UpdateBasketDto
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.slf4j.LoggerFactory
 import javax.ws.rs.GET
@@ -13,7 +13,7 @@ import javax.ws.rs.core.MediaType
 class BasketController {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
-    fun modifyBasket(@RequestBody basket: Basket) {
+    fun modifyBasket(@RequestBody basket: UpdateBasketDto) {
         logger.info("action=modifying basket")
     }
 
