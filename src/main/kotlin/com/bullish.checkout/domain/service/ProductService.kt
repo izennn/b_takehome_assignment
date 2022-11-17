@@ -1,17 +1,21 @@
 package com.bullish.checkout.domain.service
 
+import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
 import com.bullish.checkout.domain.models.Product
 import com.bullish.checkout.domain.ports.input.CreatingProductUseCase
 import com.bullish.checkout.domain.ports.input.DeletingProductUseCase
 import javax.enterprise.context.ApplicationScoped
+import javax.inject.Inject
 
 @ApplicationScoped
-class ProductService () : CreatingProductUseCase, DeletingProductUseCase {
+class ProductService @Inject constructor(
+    private val repository: InMemoryProductRepositoryImpl
+) : CreatingProductUseCase, DeletingProductUseCase {
     override fun createProduct(product: Product) {
-        TODO("Not yet implemented")
+        repository.insertProduct(product)
     }
 
     override fun deleteProduct(productId: String) {
-        TODO("Not yet implemented")
+        repository.removeProduct(productId)
     }
 }

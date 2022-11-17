@@ -1,5 +1,7 @@
 package com.bullish.checkout.adapters.input.rest
 
+import com.bullish.checkout.domain.models.CreateProductDto
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.slf4j.LoggerFactory
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -23,7 +25,7 @@ class ProductsController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    fun createProduct() {
+    fun createProduct(@RequestBody product: CreateProductDto) {
         logger.info("action=created product with productId={}")
     }
 
