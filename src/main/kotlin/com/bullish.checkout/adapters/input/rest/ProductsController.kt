@@ -15,10 +15,10 @@ class ProductsController {
     @GET
     @Path("{productId}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun listProduct(
+    fun getProduct(
         @PathParam("productId") productId: String
     ) {
-        logger.info("action=retrieving product with productId: {}", productId)
+        logger.info("action=retrieving product with productId={}", productId)
     }
 
     @POST
