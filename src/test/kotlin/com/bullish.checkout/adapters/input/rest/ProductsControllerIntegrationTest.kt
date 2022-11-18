@@ -33,7 +33,6 @@ class ProductsControllerIntegrationTest {
             .set(description = SAMPLE_PRODUCT_A.description)
             .set(price = SAMPLE_PRODUCT_A.price)
             .build()
-            .toDomain()
         givenProductsExist(SAMPLE_PRODUCT_B)
 
         //when
@@ -76,10 +75,42 @@ class ProductsControllerIntegrationTest {
     }
 
     @Test
-    fun `should throw error when adding existing product`() {}
+    fun `should throw error when adding existing product`() {
+        //given
+        givenProductsExist(SAMPLE_PRODUCT_A, SAMPLE_PRODUCT_B)
+        val createProductDto = CreateProductDtoBuilder
+            .set(name = SAMPLE_PRODUCT_A.name)
+            .set(description = SAMPLE_PRODUCT_A.description)
+            .set(price = SAMPLE_PRODUCT_A.price)
+            .build()
+
+        //when
+        val response: Response = given()
+            .contentType(ContentType.JSON)
+            .and()
+            .body(createProductDto)
+            .`when`()
+            .post("/products")
+
+        //then
+        //TODO: create global web exception mapper
+        response
+            .then()
+            .statusCode(400)
+    }
 
     @Test
-    fun `should throw error when deleting non-existent product`() {}
+    fun `should throw error when deleting non-existent product`() {
+        //when
+        val response: Response = given()
+            .`when`()
+            .delete("/products/${SAMPLE_PRODUCT_B.id}")
+
+        //then
+        response
+            .then()
+            .statusCode(400)
+    }
 
     @Transactional
     private fun givenProductsExist(vararg products: Product) {

@@ -20,8 +20,8 @@ class InMemoryProductRepositoryImpl @Inject constructor(
         return database.listAllProducts()
     }
     override fun insertProduct(product: Product) {
-        if (database.findById(product.id) != null) {
-            throw BadRequestException("Product with productId=${product.id} already exists")
+        if (database.findByProduct(product) != null) {
+            throw BadRequestException("Product with productName=${product.name} already exists")
         }
 
         database.addProductToDB(product)
@@ -29,7 +29,7 @@ class InMemoryProductRepositoryImpl @Inject constructor(
 
     override fun removeProduct(productId: String) {
         if (database.findById(productId) == null) {
-            throw BadRequestException("Product with productId=${productId} does not exists")
+            throw BadRequestException("Product with productId=${productId} does not exist")
         }
 
         database.removeProductFromDB(productId)

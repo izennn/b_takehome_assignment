@@ -26,6 +26,10 @@ object ProductDB {
         return products.find { product -> product.id == productId }
     }
 
+    fun findByProduct(productToBeFound: Product): Product? {
+        return products.find { product -> product.name == productToBeFound.name }
+    }
+
     fun addProductToDB(product: Product) {
         products.add(product)
     }

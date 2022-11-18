@@ -38,12 +38,38 @@ class InMemoryProductRepositoryImplTest {
 
     @Test
     fun `should throw error when creating an already existing product`() {
-        assertThrows<BadRequestException> {
+        val exception = assertThrows<BadRequestException> {
             //given
             givenProductsExist(SAMPLE_PRODUCT_A, SAMPLE_PRODUCT_B)
             //when
             implementer.insertProduct(SAMPLE_PRODUCT_A)
         }
+
+        Assertions.assertEquals("Product with productName=${SAMPLE_PRODUCT_A.name} already exists", exception.message)
+    }
+
+    @Test
+    fun `should be able to delete an existing product`() {
+        //given
+        givenProductsExist(SAMPLE_PRODUCT_A, SAMPLE_PRODUCT_B)
+        //when
+        implementer.removeProduct(SAMPLE_PRODUCT_B.id)
+        //then
+        val expectedSize = database.listAllProducts().size
+        Assertions.assertEquals(expectedSize, 1)
+    }
+
+    @Test
+    fun `should throw error when deleting a non-existent product`() {
+        val randomId = "random-product-id"
+        val exception = assertThrows<BadRequestException> {
+            //given
+            givenProductsExist(SAMPLE_PRODUCT_A, SAMPLE_PRODUCT_B)
+            //when
+            implementer.removeProduct(randomId)
+        }
+
+        Assertions.assertEquals("Product with productId=${randomId} does not exist", exception.message)
     }
 
     @Transactional
