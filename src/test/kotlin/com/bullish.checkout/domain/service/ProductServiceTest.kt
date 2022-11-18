@@ -2,20 +2,15 @@ package com.bullish.checkout.domain.service
 
 import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
 import com.bullish.checkout.domain.models.CreateProductDtoBuilder
-import com.bullish.checkout.domain.models.Product
-import io.mockk.every
-import io.mockk.just
-import io.mockk.runs
-import io.mockk.verify
-import io.quarkiverse.test.junit.mockk.InjectMock
 import io.quarkus.test.junit.QuarkusTest
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import javax.inject.Inject
 
 @QuarkusTest
 class ProductServiceTest {
-    @InjectMock
+    @Inject
     private lateinit var repository: InMemoryProductRepositoryImpl
 
     @Inject
@@ -23,7 +18,7 @@ class ProductServiceTest {
 
     @BeforeEach
     fun setUp() {
-        every { repository.insertProduct(SAMPLE_PRODUCT_A) } just runs
+        repository.clearAll()
     }
 
     // all the logic tested in ProductService is already covered in the repository implementation
@@ -32,10 +27,6 @@ class ProductServiceTest {
     fun `can create product`() {
         val createProductDto = CreateProductDtoBuilder.build()
         server.createProduct(createProductDto)
-        verify(exactly = 1) { repository.insertProduct(SAMPLE_PRODUCT_A) }
-    }
-
-    companion object {
-        private val SAMPLE_PRODUCT_A = Product("sample-product-a", "Dishwasher", "Something to wash your dishes", 599.99)
+        Assertions.assertEquals(1, repository.listAll().size)
     }
 }

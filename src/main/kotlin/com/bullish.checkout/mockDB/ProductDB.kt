@@ -35,6 +35,6 @@ object ProductDB {
     }
 
     fun removeProductFromDB(productId: String) {
-        products.filter { product: Product -> product.id == productId }
+        products.removeIf { product -> product.id == productId}
     }
 }

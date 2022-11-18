@@ -1,6 +1,7 @@
 package com.bullish.checkout.adapters.input.rest
 
 import com.bullish.checkout.adapters.input.rest.dto.CreateProductDto
+import com.bullish.checkout.domain.models.Product
 import com.bullish.checkout.domain.service.ProductService
 import org.slf4j.LoggerFactory
 import javax.inject.Inject
@@ -28,8 +29,10 @@ class ProductsController @Inject constructor(
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    fun createProduct(createProductDto: CreateProductDto) {
-        server.createProduct(createProductDto)
+    @Produces(MediaType.APPLICATION_JSON)
+    fun createProduct(createProductDto: CreateProductDto): Product {
+        logger.info("action=creating product={}", createProductDto.toString())
+        return server.createProduct(createProductDto)
     }
 
     @DELETE
@@ -38,6 +41,7 @@ class ProductsController @Inject constructor(
         @PathParam("productId") productId: String
     ) {
         logger.info("action=deleting product with productId={}", productId)
+        server.deleteProduct(productId)
     }
 
     companion object {

@@ -1,9 +1,12 @@
 package com.bullish.checkout.domain.models
 
+import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_DESCR
+import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_NAME
+import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_PRICE
 import com.bullish.checkout.adapters.input.rest.dto.CreateProductDto
 
 object CreateProductDtoBuilder {
-    private var dto = CreateProductDtoBuilder.default()
+    private var dto = default()
 
     @JvmName("setName")
     fun set(name: String): CreateProductDtoBuilder {
@@ -28,8 +31,8 @@ object CreateProductDtoBuilder {
     }
 
     private fun default() = CreateProductDto(
-        name = "Product",
-        description = null,
-        price = 1.99
+        name = SAMPLE_PRODUCT_NAME,
+        description = SAMPLE_PRODUCT_DESCR,
+        price = SAMPLE_PRODUCT_PRICE
     )
 }
