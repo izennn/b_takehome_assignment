@@ -1,13 +1,16 @@
 package com.bullish.checkout.adapters.input.rest
 
-import com.bullish.checkout.domain.models.CreateProductDto
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
+import com.bullish.checkout.adapters.input.rest.dto.CreateProductDto
+import com.bullish.checkout.domain.service.ProductService
 import org.slf4j.LoggerFactory
+import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
 @Path("/products")
-class ProductsController {
+class ProductsController @Inject constructor(
+    val server: ProductService
+) {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     fun listProducts() {
@@ -25,8 +28,8 @@ class ProductsController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    fun createProduct(@RequestBody product: CreateProductDto) {
-        logger.info("action=created product with productId={}")
+    fun createProduct(createProductDto: CreateProductDto) {
+        server.createProduct(createProductDto)
     }
 
     @DELETE

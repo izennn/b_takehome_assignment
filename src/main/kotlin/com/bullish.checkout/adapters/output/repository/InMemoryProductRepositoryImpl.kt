@@ -12,6 +12,13 @@ import javax.ws.rs.BadRequestException
 class InMemoryProductRepositoryImpl @Inject constructor(
     private val database: ProductDB
 ) : InsertingProductPort, RemovingProductPort {
+    fun clearAll() {
+        database.clearDB()
+    }
+
+    fun listAll(): List<Product> {
+        return database.listAllProducts()
+    }
     override fun insertProduct(product: Product) {
         if (database.findById(product.id) != null) {
             throw BadRequestException("Product with productId=${product.id} already exists")
