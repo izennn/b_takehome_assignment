@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.7.20"
     kotlin("plugin.allopen") version "1.7.20"
+    kotlin("plugin.serialization") version "1.4.31"
     id("io.quarkus")
 }
 
@@ -23,6 +24,7 @@ dependencies {
     implementation("io.quarkus:quarkus-jdbc-oracle")
     implementation("io.quarkus:quarkus-resteasy-reactive-kotlin-serialization")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")
     // javax
@@ -34,6 +36,7 @@ dependencies {
     // testing
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    testImplementation("io.quarkiverse.mockk:quarkus-junit5-mockk:1.1.1")
 }
 
 group = "com.example"
