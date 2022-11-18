@@ -1,6 +1,6 @@
 package com.bullish.checkout.adapters.input.rest
 
-import com.bullish.checkout.domain.models.UpdateBasketDto
+import com.bullish.checkout.adapters.input.rest.dto.UpdateBasketDto
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.slf4j.LoggerFactory
 import javax.ws.rs.GET
