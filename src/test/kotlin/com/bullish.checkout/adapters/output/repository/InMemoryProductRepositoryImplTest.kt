@@ -3,15 +3,13 @@ package com.bullish.checkout.adapters.output.repository
 import com.bullish.checkout.domain.models.Product
 import com.bullish.checkout.mockDB.ProductDB
 import io.quarkus.test.junit.QuarkusTest
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.*
 import javax.inject.Inject
 import javax.transaction.Transactional
 import javax.ws.rs.BadRequestException
 
 @QuarkusTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InMemoryProductRepositoryImplTest {
     @Inject
     private lateinit var database: ProductDB
@@ -21,6 +19,11 @@ class InMemoryProductRepositoryImplTest {
 
     @BeforeEach
     fun setUp() {
+        database.clearDB()
+    }
+
+    @AfterAll
+    fun tearDown() {
         database.clearDB()
     }
 
