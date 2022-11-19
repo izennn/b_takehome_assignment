@@ -3,24 +3,23 @@ package com.bullish.checkout.adapters.input.rest.dto
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_DESCR
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_NAME
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_PRICE
+import javax.enterprise.context.ApplicationScoped
 
-object CreateProductDtoBuilder {
+@ApplicationScoped
+class CreateProductDtoBuilder {
     private var dto = default()
 
-    @JvmName("setName")
-    fun set(name: String): CreateProductDtoBuilder {
+    fun setName(name: String): CreateProductDtoBuilder {
         dto.name = name
         return this
     }
 
-    @JvmName("setDescription")
-    fun set(description: String?): CreateProductDtoBuilder {
+    fun setDescription(description: String?): CreateProductDtoBuilder {
         dto.description = description
         return this
     }
 
-    @JvmName("setPrice")
-    fun set(price: Double): CreateProductDtoBuilder {
+    fun setPrice(price: Double): CreateProductDtoBuilder {
         dto.price = price
         return this
     }

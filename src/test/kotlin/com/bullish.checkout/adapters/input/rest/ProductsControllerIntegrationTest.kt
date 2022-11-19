@@ -18,6 +18,9 @@ import javax.transaction.Transactional
 @QuarkusTest
 class ProductsControllerIntegrationTest {
     @Inject
+    private lateinit var createProductDtoBuilder: CreateProductDtoBuilder
+
+    @Inject
     private lateinit var repository: InMemoryProductRepositoryImpl
 
     @BeforeEach
@@ -28,10 +31,10 @@ class ProductsControllerIntegrationTest {
     @Test
     fun `should be able to add a product`() {
         //given
-        val productADto = CreateProductDtoBuilder
-            .set(name = SAMPLE_PRODUCT_A.name)
-            .set(description = SAMPLE_PRODUCT_A.description)
-            .set(price = SAMPLE_PRODUCT_A.price)
+        val productADto = createProductDtoBuilder
+            .setName(name = SAMPLE_PRODUCT_A.name)
+            .setDescription(description = SAMPLE_PRODUCT_A.description)
+            .setPrice(price = SAMPLE_PRODUCT_A.price)
             .build()
         givenProductsExist(SAMPLE_PRODUCT_B)
 
@@ -78,10 +81,10 @@ class ProductsControllerIntegrationTest {
     fun `should throw error when adding existing product`() {
         //given
         givenProductsExist(SAMPLE_PRODUCT_A, SAMPLE_PRODUCT_B)
-        val createProductDto = CreateProductDtoBuilder
-            .set(name = SAMPLE_PRODUCT_A.name)
-            .set(description = SAMPLE_PRODUCT_A.description)
-            .set(price = SAMPLE_PRODUCT_A.price)
+        val createProductDto = createProductDtoBuilder
+            .setName(name = SAMPLE_PRODUCT_A.name)
+            .setDescription(description = SAMPLE_PRODUCT_A.description)
+            .setPrice(price = SAMPLE_PRODUCT_A.price)
             .build()
 
         //when

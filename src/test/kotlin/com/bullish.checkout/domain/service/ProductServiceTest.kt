@@ -16,6 +16,9 @@ class ProductServiceTest {
     @Inject
     private lateinit var server: ProductService
 
+    @Inject
+    private lateinit var createProductDtoBuilder: CreateProductDtoBuilder
+
     @BeforeEach
     fun setUp() {
         repository.clearAll()
@@ -23,7 +26,7 @@ class ProductServiceTest {
 
     @Test
     fun `can create product`() {
-        val createProductDto = CreateProductDtoBuilder.build()
+        val createProductDto = createProductDtoBuilder.build()
         server.createProduct(createProductDto)
         Assertions.assertEquals(1, repository.listAll().size)
     }
