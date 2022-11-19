@@ -1,5 +1,6 @@
 package com.bullish.checkout.adapters.input.rest
 
+import com.bullish.checkout.adapters.input.rest.dto.UpdateBasketDtoBuilder
 import com.bullish.checkout.adapters.output.repository.InMemoryBasketRepositoryImpl
 import com.bullish.checkout.domain.models.Basket
 import com.bullish.checkout.domain.models.BasketBuilder
@@ -16,6 +17,9 @@ import javax.transaction.Transactional
 @QuarkusTest
 class BasketControllerIntegrationTest {
     @Inject
+    private lateinit var updateBasketDtoBuilder: UpdateBasketDtoBuilder
+
+    @Inject
     private lateinit var repository: InMemoryBasketRepositoryImpl
 
     @BeforeEach
@@ -27,13 +31,14 @@ class BasketControllerIntegrationTest {
     fun `should be able to add product`() {
         //given
         givenBasket(SAMPLE_BASKET)
-        val newBasket = BasketBuilder.setProductCount(
-            mutableMapOf(
-                "product-a" to 6,
-                "product-b" to 1,
-                "product-c" to 7
-            )
-        ).build()
+        val newBasket = updateBasketDtoBuilder
+            .setProductCount(
+                mutableMapOf(
+                    "product-a" to 6,
+                    "product-b" to 1,
+                    "product-c" to 7
+                )
+            ).build()
 
         //when
         val response: Response = given()
@@ -61,13 +66,13 @@ class BasketControllerIntegrationTest {
     }
 
     companion object {
-        val SAMPLE_BASKET = BasketBuilder
+        val basketBuilder: BasketBuilder = BasketBuilder()
+        val SAMPLE_BASKET = basketBuilder
             .setProductCount(
                 mutableMapOf(
                     "product-a" to 1,
                     "product-b" to 5
                 )
-            )
-            .build()
+            ).build()
     }
 }

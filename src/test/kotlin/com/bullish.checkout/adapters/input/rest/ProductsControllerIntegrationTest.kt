@@ -9,13 +9,12 @@ import io.restassured.http.ContentType
 import io.restassured.response.Response
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import javax.inject.Inject
 import javax.transaction.Transactional
 
 @QuarkusTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProductsControllerIntegrationTest {
     @Inject
     private lateinit var createProductDtoBuilder: CreateProductDtoBuilder
@@ -25,6 +24,11 @@ class ProductsControllerIntegrationTest {
 
     @BeforeEach
     fun setUp() {
+        repository.clearAll()
+    }
+
+    @AfterAll
+    fun tearDown() {
         repository.clearAll()
     }
 

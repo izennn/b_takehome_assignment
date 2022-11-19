@@ -6,12 +6,10 @@ import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_PRICE
 import io.quarkus.test.junit.QuarkusTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import javax.inject.Inject
 
 @QuarkusTest
 class CreateProductDtoTest {
-    @Inject
-    private lateinit var createProductDtoBuilder: CreateProductDtoBuilder
+    private val createProductDtoBuilder: CreateProductDtoBuilder = CreateProductDtoBuilder()
 
     @Test
     fun `when converting product DTO to product model, an UUID is added`() {

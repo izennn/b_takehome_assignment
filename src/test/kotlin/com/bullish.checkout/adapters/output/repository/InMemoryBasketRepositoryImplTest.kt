@@ -17,6 +17,8 @@ class InMemoryBasketRepositoryImplTest {
     @Inject
     private lateinit var implementer: InMemoryBasketRepositoryImpl
 
+    private val basketBuilder: BasketBuilder = BasketBuilder()
+
     @Transactional
     @BeforeEach
     fun setUp() {
@@ -41,7 +43,13 @@ class InMemoryBasketRepositoryImplTest {
     @Test
     fun `remove a product`() {
         //given
-        givenBasket(SAMPLE_BASKET)
+        givenBasket(basketBuilder
+            .setProductCount(mutableMapOf(
+                "product-a" to 5,
+                "product-b" to 2
+            ))
+            .build()
+        )
         //when
         implementer.removeProduct("product-b", 3)
         //then
@@ -52,8 +60,13 @@ class InMemoryBasketRepositoryImplTest {
     @Test
     fun `increase a product count`() {
         //given
-        givenBasket(SAMPLE_BASKET)
-        //when
+        givenBasket(basketBuilder
+            .setProductCount(mutableMapOf(
+                "product-a" to 5,
+                "product-b" to 2
+            ))
+            .build()
+        )        //when
         implementer.addProduct("product-a", 5)
         //then
         val actualCount = database.getProductCount()
@@ -63,8 +76,13 @@ class InMemoryBasketRepositoryImplTest {
     @Test
     fun `decrease a product count`() {
         //given
-        givenBasket(SAMPLE_BASKET)
-        //when
+        givenBasket(basketBuilder
+            .setProductCount(mutableMapOf(
+                "product-a" to 5,
+                "product-b" to 2
+            ))
+            .build()
+        )        //when
         implementer.removeProduct("product-a", 3)
         //then
         val actualCount = database.getProductCount()
@@ -74,11 +92,5 @@ class InMemoryBasketRepositoryImplTest {
     @Transactional
     private fun givenBasket(basket: Basket) {
         database.updateBasket(basket)
-    }
-
-    companion object {
-        val SAMPLE_BASKET = BasketBuilder
-            .setProductCount(mutableMapOf("product-a" to 5, "product-b" to 2))
-            .build()
     }
 }

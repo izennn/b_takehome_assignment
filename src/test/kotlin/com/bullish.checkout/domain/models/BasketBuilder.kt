@@ -1,6 +1,6 @@
 package com.bullish.checkout.domain.models
 
-object BasketBuilder {
+class BasketBuilder {
     private var basket: Basket = default()
 
     fun setProductCount(newProductCount: MutableMap<String, Int>): BasketBuilder {

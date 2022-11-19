@@ -16,6 +16,9 @@ class BasketServiceTest {
     @Inject
     private lateinit var service: BasketService
 
+    @Inject
+    private lateinit var updateBasketDtoBuilder: UpdateBasketDtoBuilder
+
     @BeforeEach
     fun setUp() {
         repository.clearAll()
@@ -24,8 +27,8 @@ class BasketServiceTest {
     @Test
     fun `modifies basket contents`() {
         //given
-        val updateDto = UpdateBasketDtoBuilder
-            .set(mutableMapOf(
+        val updateDto = updateBasketDtoBuilder
+            .setProductCount(mutableMapOf(
                 "product-a" to 5,
                 "product-b" to 1,
                 "product-c" to 9

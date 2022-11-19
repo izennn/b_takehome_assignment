@@ -19,6 +19,11 @@ class InMemoryProductRepositoryImpl @Inject constructor(
     fun listAll(): List<Product> {
         return database.listAllProducts()
     }
+
+    fun getByProductId(productId: String): Product? {
+        return database.findById(productId)
+    }
+
     override fun insertProduct(product: Product) {
         if (database.findByProduct(product) != null) {
             throw BadRequestException("Product with productName=${product.name} already exists")

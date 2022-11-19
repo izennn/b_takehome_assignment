@@ -56,7 +56,7 @@ object BasketDB {
     }
 
     fun updateBasket(newBasket: Basket) {
-        basket = newBasket
+        basket.productCount = newBasket.productCount
     }
 
     private fun hasProduct(productId: String): Boolean {
