@@ -25,16 +25,39 @@ class InMemoryBasketRepositoryImplTest {
     }
 
     @Test
-    fun `add products to the basket`() {
-        //given
+    fun `add a new product`() {
         //when
         implementer.addProduct("product-a", 5)
         //then
+        val actualCount = database.getProductCount()
         Assertions.assertEquals(1, database.getProductCount().size)
+        Assertions.assertEquals(5, actualCount["product-a"])
     }
 
     @Test
-    fun `remove products from the basket`() {
+    fun `increase a product count`() {
+        //given
+        givenBasketHasProducts(mutableMapOf("product-a" to 5, "product-b" to 2))
+        //when
+        implementer.addProduct("product-a", 5)
+        //then
+        val actualCount = database.getProductCount()
+        Assertions.assertEquals(10, actualCount["product-a"])
+    }
+
+    @Test
+    fun `remove a product`() {
+        //given
+        givenBasketHasProducts(mutableMapOf("product-a" to 5, "product-b" to 2))
+        //when
+        implementer.removeProduct("product-b", 3)
+        //then
+        val actualCount = database.getProductCount()
+        Assertions.assertEquals(1, actualCount.keys.size)
+    }
+
+    @Test
+    fun `decrease a product count`() {
         //given
         givenBasketHasProducts(mutableMapOf("product-a" to 5, "product-b" to 2))
         //when
