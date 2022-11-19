@@ -3,7 +3,6 @@ package com.bullish.checkout.adapters.input.rest.dto
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_DESCR
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_NAME
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_PRICE
-import com.bullish.checkout.domain.models.CreateProductDtoBuilder
 import io.quarkus.test.junit.QuarkusTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test

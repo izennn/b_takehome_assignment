@@ -1,9 +1,8 @@
-package com.bullish.checkout.domain.models
+package com.bullish.checkout.adapters.input.rest.dto
 
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_DESCR
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_NAME
 import com.bullish.checkout.TestUtils.SAMPLE_PRODUCT_PRICE
-import com.bullish.checkout.adapters.input.rest.dto.CreateProductDto
 
 object CreateProductDtoBuilder {
     private var dto = default()

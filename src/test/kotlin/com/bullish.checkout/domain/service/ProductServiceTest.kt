@@ -1,7 +1,7 @@
 package com.bullish.checkout.domain.service
 
+import com.bullish.checkout.adapters.input.rest.dto.CreateProductDtoBuilder
 import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
-import com.bullish.checkout.domain.models.CreateProductDtoBuilder
 import io.quarkus.test.junit.QuarkusTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
@@ -21,12 +21,13 @@ class ProductServiceTest {
         repository.clearAll()
     }
 
-    // all the logic tested in ProductService is already covered in the repository implementation
-    // hence will only ensure that it runs okay
     @Test
     fun `can create product`() {
         val createProductDto = CreateProductDtoBuilder.build()
         server.createProduct(createProductDto)
         Assertions.assertEquals(1, repository.listAll().size)
     }
+
+    // deleteProduct method is just invoking repository method .removeProduct
+    // hence for the sake of time will skip that testing as it's already covered in controller integration test
 }

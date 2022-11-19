@@ -1,7 +1,7 @@
 package com.bullish.checkout.adapters.input.rest
 
+import com.bullish.checkout.adapters.input.rest.dto.CreateProductDtoBuilder
 import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
-import com.bullish.checkout.domain.models.CreateProductDtoBuilder
 import com.bullish.checkout.domain.models.Product
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
