@@ -1,20 +1,24 @@
 package com.bullish.checkout.adapters.input.rest
 
 import com.bullish.checkout.adapters.input.rest.dto.UpdateBasketDto
+import com.bullish.checkout.domain.models.Basket
+import com.bullish.checkout.domain.service.BasketService
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
 import org.slf4j.LoggerFactory
-import javax.ws.rs.GET
-import javax.ws.rs.PUT
-import javax.ws.rs.Path
-import javax.ws.rs.Produces
+import javax.inject.Inject
+import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
 @Path("/basket")
-class BasketController {
+class BasketController @Inject constructor(
+    private val server: BasketService
+) {
     @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun modifyBasket(@RequestBody basket: UpdateBasketDto) {
+    fun modifyBasket(@RequestBody updateBasketDto: UpdateBasketDto): Basket {
         logger.info("action=modifying basket")
+        return server.modifyBasket(updateBasketDto)
     }
 
     @GET

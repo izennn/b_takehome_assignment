@@ -1,9 +1,12 @@
 package com.bullish.checkout.adapters.output.repository
 
+import com.bullish.checkout.domain.models.Basket
+import com.bullish.checkout.domain.models.BasketBuilder
 import com.bullish.checkout.mockDB.BasketDB
 import io.quarkus.test.junit.QuarkusTest
 import org.junit.jupiter.api.*
 import javax.inject.Inject
+import javax.transaction.Transactional
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -14,6 +17,7 @@ class InMemoryBasketRepositoryImplTest {
     @Inject
     private lateinit var implementer: InMemoryBasketRepositoryImpl
 
+    @Transactional
     @BeforeEach
     fun setUp() {
         database.clearDB()
@@ -35,20 +39,9 @@ class InMemoryBasketRepositoryImplTest {
     }
 
     @Test
-    fun `increase a product count`() {
-        //given
-        givenBasketHasProducts(mutableMapOf("product-a" to 5, "product-b" to 2))
-        //when
-        implementer.addProduct("product-a", 5)
-        //then
-        val actualCount = database.getProductCount()
-        Assertions.assertEquals(10, actualCount["product-a"])
-    }
-
-    @Test
     fun `remove a product`() {
         //given
-        givenBasketHasProducts(mutableMapOf("product-a" to 5, "product-b" to 2))
+        givenBasket(SAMPLE_BASKET)
         //when
         implementer.removeProduct("product-b", 3)
         //then
@@ -57,9 +50,20 @@ class InMemoryBasketRepositoryImplTest {
     }
 
     @Test
+    fun `increase a product count`() {
+        //given
+        givenBasket(SAMPLE_BASKET)
+        //when
+        implementer.addProduct("product-a", 5)
+        //then
+        val actualCount = database.getProductCount()
+        Assertions.assertEquals(10, actualCount["product-a"])
+    }
+
+    @Test
     fun `decrease a product count`() {
         //given
-        givenBasketHasProducts(mutableMapOf("product-a" to 5, "product-b" to 2))
+        givenBasket(SAMPLE_BASKET)
         //when
         implementer.removeProduct("product-a", 3)
         //then
@@ -67,7 +71,14 @@ class InMemoryBasketRepositoryImplTest {
         Assertions.assertEquals(2, actualCount["product-a"])
     }
 
-    private fun givenBasketHasProducts(productsCount: MutableMap<String, Int>) {
-        database.updateProductCount(productsCount)
+    @Transactional
+    private fun givenBasket(basket: Basket) {
+        database.updateBasket(basket)
+    }
+
+    companion object {
+        val SAMPLE_BASKET = BasketBuilder
+            .setProductCount(mutableMapOf("product-a" to 5, "product-b" to 2))
+            .build()
     }
 }

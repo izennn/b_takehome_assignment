@@ -8,12 +8,16 @@ import javax.enterprise.context.ApplicationScoped
 @ApplicationScoped
 object BasketDB {
     private val logger: Logger = LoggerFactory.getLogger(BasketDB::class.java)
-    private val basket: Basket = Basket(
+    private var basket: Basket = Basket(
         productCount = mutableMapOf()
     )
 
     init {
         logger.info("Basket database singleton class invoked")
+    }
+
+    fun getBasket(): Basket {
+        return basket
     }
 
     fun clearDB() {
@@ -51,8 +55,8 @@ object BasketDB {
         }
     }
 
-    fun updateProductCount(newProductCount: Map<String, Int>) {
-        basket.productCount = newProductCount as MutableMap<String, Int>
+    fun updateBasket(newBasket: Basket) {
+        basket = newBasket
     }
 
     private fun hasProduct(productId: String): Boolean {

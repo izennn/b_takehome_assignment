@@ -1,5 +1,6 @@
 package com.bullish.checkout.adapters.output.repository
 
+import com.bullish.checkout.domain.models.Basket
 import com.bullish.checkout.domain.ports.output.UpdateBasketPort
 import com.bullish.checkout.mockDB.BasketDB
 import javax.enterprise.context.ApplicationScoped
@@ -13,15 +14,20 @@ class InMemoryBasketRepositoryImpl @Inject constructor(
         database.clearDB()
     }
 
-    fun addProduct(productId: String, count: Int) {
+    fun getBasket(): Basket {
+        return database.getBasket()
+    }
+
+    override fun addProduct(productId: String, count: Int) {
         database.addProductCount(productId, count)
     }
 
-    fun removeProduct(productId: String, count: Int) {
+    override fun removeProduct(productId: String, count: Int) {
         database.removeProductCount(productId, count)
     }
 
-    fun updateProductCount(newProductCount: Map<String, Int>) {
-        database.updateProductCount(newProductCount)
+    override fun updateBasket(newBasket: Basket): Basket {
+        database.updateBasket(newBasket)
+        return newBasket
     }
 }
