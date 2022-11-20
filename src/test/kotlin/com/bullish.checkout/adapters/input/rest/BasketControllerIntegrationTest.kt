@@ -66,7 +66,7 @@ class BasketControllerIntegrationTest {
     }
 
     companion object {
-        val basketBuilder: BasketBuilder = BasketBuilder()
+        private val basketBuilder: BasketBuilder = BasketBuilder()
         val SAMPLE_BASKET = basketBuilder
             .setProductCount(
                 mutableMapOf(
