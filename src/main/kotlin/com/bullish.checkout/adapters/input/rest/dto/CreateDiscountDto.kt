@@ -8,12 +8,14 @@ data class CreateDiscountDto(
     var id: String,
     var productCount: Int,
     var discountInPercentage: Int? = null,
-    var discountInPrice: Double? = null
+    var discountInPrice: Double? = null,
+    var description: String? = null
 ) {
     fun toDomain() = Discount(
         productId = id,
         productCount = productCount,
         discountInPercentage = discountInPercentage,
-        discountInPrice = discountInPrice
+        discountInPrice = discountInPrice,
+        description = description
     )
 }
