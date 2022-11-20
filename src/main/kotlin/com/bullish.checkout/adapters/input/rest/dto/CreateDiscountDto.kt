@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class CreateDiscountDto(
     var id: String,
     var productCount: Int,
-    var discountInPercentage: Int? = null,
+    var discountInPercentage: Int,
     var description: String? = null
 ) {
     fun toDomain() = Discount(
