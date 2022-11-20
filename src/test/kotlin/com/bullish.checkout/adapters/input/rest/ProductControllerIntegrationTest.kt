@@ -15,7 +15,7 @@ import javax.transaction.Transactional
 
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ProductsControllerIntegrationTest {
+class ProductControllerIntegrationTest {
     @Inject
     private lateinit var createProductDtoBuilder: CreateProductDtoBuilder
 

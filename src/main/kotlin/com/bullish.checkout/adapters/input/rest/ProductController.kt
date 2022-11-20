@@ -9,7 +9,7 @@ import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
 @Path("/products")
-class ProductsController @Inject constructor(
+class ProductController @Inject constructor(
     val server: ProductService
 ) {
     @GET
@@ -45,6 +45,6 @@ class ProductsController @Inject constructor(
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(ProductsController::class.java)
+        private val logger = LoggerFactory.getLogger(ProductController::class.java)
     }
 }
