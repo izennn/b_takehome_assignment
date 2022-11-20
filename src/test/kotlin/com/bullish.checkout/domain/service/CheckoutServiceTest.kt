@@ -46,9 +46,9 @@ class CheckoutServiceTest {
             )
             .build()
         //when
-        val actual = checkoutService.checkout()
+        val receipt = checkoutService.checkout()
         //then
-        Assertions.assertEquals(PRODUCT_B.price * 1 + PRODUCT_C.price * 10, actual.price)
+        Assertions.assertEquals(PRODUCT_B.price * 1 + PRODUCT_C.price * 10, receipt.totalPrice)
     }
 
     @Test
@@ -65,7 +65,7 @@ class CheckoutServiceTest {
             .build()
 
         //when
-        val actual = checkoutService.checkout()
+        val receipt = checkoutService.checkout()
 
         //then
         val expectedPrice = (
@@ -73,7 +73,7 @@ class CheckoutServiceTest {
                         + PRODUCT_B.price * 1
                         + PRODUCT_C.price * 10
                 )
-        Assertions.assertEquals(expectedPrice, actual.price)
+        Assertions.assertEquals(expectedPrice, receipt.totalPrice)
     }
 
     @Test
@@ -97,7 +97,7 @@ class CheckoutServiceTest {
             .toDomain()
 
         //when
-        val actual = checkoutService.checkout()
+        val receipt = checkoutService.checkout()
 
         //then
         val expectedPrice = (
@@ -105,7 +105,7 @@ class CheckoutServiceTest {
                         + PRODUCT_B.price * 1
                         + PRODUCT_C.price * 10 - (PRODUCT_C.price * 50 * 0.01 * 10.floorDiv(3))
                 )
-        Assertions.assertEquals(expectedPrice, actual.price)
+        Assertions.assertEquals(expectedPrice, receipt.totalPrice)
     }
 
     companion object {

@@ -4,8 +4,10 @@ import com.bullish.checkout.adapters.output.repository.InMemoryBasketRepositoryI
 import com.bullish.checkout.adapters.output.repository.InMemoryDiscountRepositoryImpl
 import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
 import com.bullish.checkout.domain.models.Discount
+import com.bullish.checkout.domain.models.Product
 import com.bullish.checkout.domain.models.Receipt
 import com.bullish.checkout.domain.ports.input.CheckoutUseCase
+import kotlinx.serialization.Serializable
 import javax.enterprise.context.ApplicationScoped
 import javax.inject.Inject
 
@@ -16,53 +18,75 @@ class CheckoutService @Inject constructor(
     val discountRepository: InMemoryDiscountRepositoryImpl
 ) : CheckoutUseCase {
     override fun checkout(): Receipt {
-        // TODO: factor in discounts
-        var sum = 0.00
         val basket = basketRepository.getBasket()
-        basket.productCount.entries.forEach { entry ->
-            sum = sum.plus(totalProductPrice(entry.key, entry.value))
+        val items: List<ReceiptItem> =
+            basket.productCount.entries.mapNotNull { entry -> mapToReceiptItem(entry.key, entry.value) }
+
+        var totalPriceBeforeDiscount = 0.00
+        var totalDiscount = 0.00
+        var totalPrice = 0.00
+        items.forEach { item ->
+            run {
+                totalPriceBeforeDiscount += item.priceBeforeDiscount
+                totalDiscount += item.discount
+                totalPrice += item.totalPrice
+            }
         }
 
         return Receipt(
-            price = sum
+            items = items,
+            totalPriceBeforeDiscount = totalPriceBeforeDiscount,
+            totalDiscount = totalDiscount,
+            totalPrice = totalPrice
         )
     }
 
-    private fun getProductPrice(productId: String): Double? {
+    private fun mapToReceiptItem(productId: String, count: Int): ReceiptItem? {
+        val product = getProduct(productId) ?: return null
+        val priceBeforeDiscount = product.price * count
+        val discount = getProductDiscount(productId)
+        val calculatedDiscount = calculateDiscount(product.price, discount, count)
+
+        return ReceiptItem(
+            product = product.name,
+            priceBeforeDiscount = priceBeforeDiscount,
+            discount = calculatedDiscount,
+            discountDescription = discount?.description,
+            totalPrice = priceBeforeDiscount - calculatedDiscount
+        )
+    }
+    private fun getProduct(productId: String): Product? {
         return when (val product = productRepository.getByProductId(productId)) {
-            null -> null
-            else -> product.price
+            null -> {
+                logger.info("Checking out, could not find product information on productId={}", productId)
+                null
+            }
+
+            else -> product
         }
     }
 
     private fun getProductDiscount(productId: String): Discount? {
         return discountRepository.getDiscount(productId)
     }
-    private fun totalProductPrice(productId: String, count: Int): Double {
-        var sum = 0.00
-        val price = getProductPrice(productId)
 
-        when (price) {
-            null -> {
-                logger.error("Could not find product info for productId={}", productId)
-                return sum
-            }
-            else -> {
-                sum += (price * count)
-            }
-        }
-
-        return when (val discount = getProductDiscount(productId)) {
-            null -> sum
-            else -> {
-                val discountAppliedTimes = count.floorDiv(discount.productCount)
-                val discountPercentage = discount.discountInPercentage * 0.01
-                sum - (price * discountPercentage * discountAppliedTimes)
-            }
-        }
+    private fun calculateDiscount(price: Double, discount: Discount?, count: Int): Double {
+        if (discount == null) return 0.00
+        
+        val discountAppliedCount = count.floorDiv(discount.productCount)
+        return price * discount.discountInPercentage * 0.01 * discountAppliedCount
     }
 
     companion object {
         private val logger = org.slf4j.LoggerFactory.getLogger(CheckoutService::class.java)
     }
 }
+
+@Serializable
+data class ReceiptItem(
+    val product: String,
+    val priceBeforeDiscount: Double,
+    val discount: Double,
+    val discountDescription: String? = null,
+    val totalPrice: Double
+)

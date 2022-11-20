@@ -1,34 +1,54 @@
 package com.bullish.checkout.adapters.input.rest
 
+import com.bullish.checkout.adapters.input.rest.dto.CreateDiscountDtoBuilder
 import com.bullish.checkout.adapters.input.rest.dto.UpdateBasketDtoBuilder
 import com.bullish.checkout.adapters.output.repository.InMemoryBasketRepositoryImpl
+import com.bullish.checkout.adapters.output.repository.InMemoryDiscountRepositoryImpl
+import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
 import com.bullish.checkout.domain.models.Basket
 import com.bullish.checkout.domain.models.BasketBuilder
+import com.bullish.checkout.domain.models.Discount
+import com.bullish.checkout.domain.models.Product
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import io.restassured.response.Response
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.hamcrest.CoreMatchers.`is`
+import org.junit.jupiter.api.*
 import javax.inject.Inject
 import javax.transaction.Transactional
 
 @QuarkusTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BasketControllerIntegrationTest {
     @Inject
     private lateinit var updateBasketDtoBuilder: UpdateBasketDtoBuilder
 
     @Inject
-    private lateinit var repository: InMemoryBasketRepositoryImpl
+    private lateinit var basketRepository: InMemoryBasketRepositoryImpl
+
+    @Inject
+    private lateinit var productRepository: InMemoryProductRepositoryImpl
+
+    @Inject
+    private lateinit var discountRepository: InMemoryDiscountRepositoryImpl
 
     @BeforeEach
     fun setUp() {
-        repository.clearAll()
+        productRepository.clearAll()
+        basketRepository.clearAll()
+        discountRepository.clearAll()
+    }
+
+    @AfterAll
+    fun tearDown() {
+        productRepository.clearAll()
+        basketRepository.clearAll()
+        discountRepository.clearAll()
     }
 
     @Test
-    fun `should be able to add product`() {
+    fun `should be able to modify basket products`() {
         //given
         givenBasket(SAMPLE_BASKET)
         val newBasket = updateBasketDtoBuilder
@@ -53,26 +73,88 @@ class BasketControllerIntegrationTest {
             .then()
             .statusCode(200)
 
-        val actualProductCount = repository.getBasket().productCount
+        val actualProductCount = basketRepository.getBasket().productCount
         Assertions.assertEquals(3, actualProductCount.size)
         Assertions.assertEquals(6, actualProductCount["product-a"])
         Assertions.assertEquals(1, actualProductCount["product-b"])
         Assertions.assertEquals(7, actualProductCount["product-c"])
     }
 
+    @Test
+    fun `on checkout, a receipt of items along with total price should be returned`() {
+        //given
+        givenProducts(SAMPLE_PRODUCT_A, SAMPLE_PRODUCT_B)
+        givenBasket(SAMPLE_BASKET)
+        givenDiscounts(DISCOUNT_A, DISCOUNT_B)
+
+        //when
+        val response: Response = given()
+            .`when`()
+            .get("/basket/checkout")
+
+        //then
+        val totalPriceBeforeDiscount = (SAMPLE_PRODUCT_A.price * 1 + SAMPLE_PRODUCT_B.price * 5)
+        val totalDiscount = (SAMPLE_PRODUCT_A.price * 1 * DISCOUNT_A.discountInPercentage * 0.01
+                + SAMPLE_PRODUCT_B.price * DISCOUNT_B.discountInPercentage * 0.01 * 2
+                )
+        response
+            .then()
+            .statusCode(200)
+            .body(
+                "items.size()", `is`(2),
+                "totalPriceBeforeDiscount.toString()", `is`(totalPriceBeforeDiscount.toString()),
+                "totalDiscount.toString()", `is`(totalDiscount.toString()),
+                "totalPrice.toString()", `is`((totalPriceBeforeDiscount - totalDiscount).toString())
+            )
+    }
+
+    @Transactional
+    private fun givenProducts(vararg products: Product) {
+        products.forEach { product ->
+            productRepository.insertProduct(product)
+        }
+    }
+
     @Transactional
     private fun givenBasket(basket: Basket) {
-        repository.updateBasket(basket)
+        basketRepository.updateBasket(basket)
+    }
+
+    @Transactional
+    private fun givenDiscounts(vararg discounts: Discount) {
+        discounts.forEach { discount: Discount -> discountRepository.addDiscount(discount) }
     }
 
     companion object {
         private val basketBuilder: BasketBuilder = BasketBuilder()
+        private val createDiscountDtoBuilder: CreateDiscountDtoBuilder = CreateDiscountDtoBuilder()
+
+        val SAMPLE_PRODUCT_A = Product("product-a", "Product A", null, 5.99)
+        val SAMPLE_PRODUCT_B = Product("product-b", "Product B", "Product B Description", 699.99)
+
         val SAMPLE_BASKET = basketBuilder
             .setProductCount(
                 mutableMapOf(
                     "product-a" to 1,
                     "product-b" to 5
                 )
-            ).build()
+            )
+            .build()
+
+        val DISCOUNT_A = createDiscountDtoBuilder
+            .setId("product-a")
+            .setProductCount(1)
+            .setDiscountInPercentage(20)
+            .setDescription("20% off on all product A")
+            .build()
+            .toDomain()
+
+        val DISCOUNT_B = createDiscountDtoBuilder
+            .setId("product-b")
+            .setProductCount(2)
+            .setDiscountInPercentage(10)
+            .setDescription("20% off on all product A")
+            .build()
+            .toDomain()
     }
 }
