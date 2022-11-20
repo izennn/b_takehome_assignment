@@ -62,5 +62,4 @@ object BasketDB {
     private fun hasProduct(productId: String): Boolean {
         return basket.productCount.containsKey(productId)
     }
-
 }
