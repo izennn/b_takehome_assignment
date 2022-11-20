@@ -27,7 +27,7 @@ class ProductServiceTest {
     @Test
     fun `can create product`() {
         val createProductDto = createProductDtoBuilder.build()
-        server.createProduct(createProductDto)
+        server.createProduct(createProductDto.toDomain())
         Assertions.assertEquals(1, repository.listAll().size)
     }
 

@@ -10,7 +10,7 @@ import javax.ws.rs.core.MediaType
 
 @Path("/products")
 class ProductController @Inject constructor(
-    val server: ProductService
+    val productService: ProductService
 ) {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -32,7 +32,8 @@ class ProductController @Inject constructor(
     @Produces(MediaType.APPLICATION_JSON)
     fun createProduct(createProductDto: CreateProductDto): Product {
         logger.info("action=creating product={}", createProductDto.toString())
-        return server.createProduct(createProductDto)
+        val product = createProductDto.toDomain()
+        return productService.createProduct(product)
     }
 
     @DELETE
@@ -41,7 +42,7 @@ class ProductController @Inject constructor(
         @PathParam("productId") productId: String
     ) {
         logger.info("action=deleting product with productId={}", productId)
-        server.deleteProduct(productId)
+        productService.deleteProduct(productId)
     }
 
     companion object {
