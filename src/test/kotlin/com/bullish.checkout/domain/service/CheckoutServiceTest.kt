@@ -4,9 +4,9 @@ import com.bullish.checkout.adapters.input.rest.dto.CreateDiscountDtoBuilder
 import com.bullish.checkout.adapters.output.repository.InMemoryBasketRepositoryImpl
 import com.bullish.checkout.adapters.output.repository.InMemoryDiscountRepositoryImpl
 import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
+import com.bullish.checkout.domain.Utils
 import com.bullish.checkout.domain.models.BasketBuilder
 import com.bullish.checkout.domain.models.Product
-import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.mockk
 import io.quarkus.test.junit.QuarkusTest
@@ -23,9 +23,8 @@ class CheckoutServiceTest {
     private val checkoutService: CheckoutService =
         CheckoutService(basketRepositoryImpl, productRepositoryImpl, discountRepositoryImpl)
 
-    @BeforeAll
-    fun setUp() {
-        MockKAnnotations.init(this)
+    @BeforeEach
+    fun setUpBeforeEach() {
         every { productRepositoryImpl.getByProductId(PRODUCT_A.id) } returns PRODUCT_A
         every { productRepositoryImpl.getByProductId(PRODUCT_B.id) } returns PRODUCT_B
         every { productRepositoryImpl.getByProductId(PRODUCT_C.id) } returns PRODUCT_C
@@ -35,7 +34,7 @@ class CheckoutServiceTest {
     }
 
     @Test
-    fun `should be able to checkout (without discounts)`() {
+    fun `checkout (without discounts)`() {
         //given
         every { basketRepositoryImpl.getBasket() } returns basketBuilder
             .setProductCount(
@@ -48,11 +47,14 @@ class CheckoutServiceTest {
         //when
         val receipt = checkoutService.checkout()
         //then
-        Assertions.assertEquals(PRODUCT_B.price * 1 + PRODUCT_C.price * 10, receipt.totalPrice)
+        val totalPriceBeforeDiscount = Utils.roundOffDecimal(PRODUCT_B.price * 1 + PRODUCT_C.price * 10)
+        Assertions.assertEquals(totalPriceBeforeDiscount, receipt.totalPriceBeforeDiscount)
+        Assertions.assertEquals(0.00, receipt.totalDiscount)
+        Assertions.assertEquals(totalPriceBeforeDiscount, receipt.totalPrice)
     }
 
     @Test
-    fun `should be able to checkout, with one discount`() {
+    fun `checkout, with one discount`() {
         //given
         every { basketRepositoryImpl.getBasket() } returns basketBuilder
             .setProductCount(
@@ -68,16 +70,17 @@ class CheckoutServiceTest {
         val receipt = checkoutService.checkout()
 
         //then
-        val expectedPrice = (
-                PRODUCT_A.price * 5 - (PRODUCT_A.price * DISCOUNT_A.discountInPercentage * 0.01 * 5.floorDiv(DISCOUNT_A.productCount))
-                        + PRODUCT_B.price * 1
-                        + PRODUCT_C.price * 10
-                )
-        Assertions.assertEquals(expectedPrice, receipt.totalPrice)
+        val priceBeforeDiscount =
+            Utils.roundOffDecimal(PRODUCT_A.price * 5 + PRODUCT_B.price * 1 + PRODUCT_C.price * 10)
+        val discount =
+            Utils.roundOffDecimal(PRODUCT_A.price * DISCOUNT_A.discountInPercentage * 0.01 * 5.floorDiv(DISCOUNT_A.productCount))
+        Assertions.assertEquals(priceBeforeDiscount, receipt.totalPriceBeforeDiscount)
+        Assertions.assertEquals(discount, receipt.totalDiscount)
+        Assertions.assertEquals(priceBeforeDiscount - discount, receipt.totalPrice)
     }
 
     @Test
-    fun `should be able to checkout, with more than one discount and one of the discount is applied more than once`() {
+    fun `checkout, with more than one discount and one of the discount is applied more than once`() {
         //given
         every { basketRepositoryImpl.getBasket() } returns basketBuilder
             .setProductCount(
@@ -100,12 +103,15 @@ class CheckoutServiceTest {
         val receipt = checkoutService.checkout()
 
         //then
-        val expectedPrice = (
-                PRODUCT_A.price * 5 - (PRODUCT_A.price * DISCOUNT_A.discountInPercentage * 0.01 * 5.floorDiv(DISCOUNT_A.productCount))
-                        + PRODUCT_B.price * 1
-                        + PRODUCT_C.price * 10 - (PRODUCT_C.price * 50 * 0.01 * 10.floorDiv(3))
-                )
-        Assertions.assertEquals(expectedPrice, receipt.totalPrice)
+        val expectedPriceBeforeDiscount =
+            Utils.roundOffDecimal(PRODUCT_A.price * 5 + +PRODUCT_B.price * 1 + +PRODUCT_C.price * 10)
+        val expectedDiscount = Utils.roundOffDecimal(
+            PRODUCT_A.price * DISCOUNT_A.discountInPercentage * 0.01 * 5.floorDiv(DISCOUNT_A.productCount)
+                    + PRODUCT_C.price * 50 * 0.01 * 10.floorDiv(3)
+        )
+        Assertions.assertEquals(expectedPriceBeforeDiscount, receipt.totalPriceBeforeDiscount)
+        Assertions.assertEquals(expectedDiscount, receipt.totalDiscount)
+        Assertions.assertEquals(expectedPriceBeforeDiscount - expectedDiscount, receipt.totalPrice)
     }
 
     companion object {

@@ -5,6 +5,7 @@ import com.bullish.checkout.adapters.input.rest.dto.UpdateBasketDtoBuilder
 import com.bullish.checkout.adapters.output.repository.InMemoryBasketRepositoryImpl
 import com.bullish.checkout.adapters.output.repository.InMemoryDiscountRepositoryImpl
 import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
+import com.bullish.checkout.domain.Utils
 import com.bullish.checkout.domain.models.Basket
 import com.bullish.checkout.domain.models.BasketBuilder
 import com.bullish.checkout.domain.models.Discount
@@ -93,18 +94,26 @@ class BasketControllerIntegrationTest {
             .get("/basket/checkout")
 
         //then
-        val totalPriceBeforeDiscount = (SAMPLE_PRODUCT_A.price * 1 + SAMPLE_PRODUCT_B.price * 5)
-        val totalDiscount = (SAMPLE_PRODUCT_A.price * 1 * DISCOUNT_A.discountInPercentage * 0.01
-                + SAMPLE_PRODUCT_B.price * DISCOUNT_B.discountInPercentage * 0.01 * 2
-                )
+        val expectedTotalPriceBeforeDiscount = Utils.roundOffDecimal(
+            Utils.roundOffDecimal(SAMPLE_PRODUCT_A.price * 1) +
+                    Utils.roundOffDecimal(SAMPLE_PRODUCT_B.price * 5)
+        )
+        val expectedTotalDiscount = Utils.roundOffDecimal(
+            Utils.roundOffDecimal(SAMPLE_PRODUCT_A.price * DISCOUNT_A.discountInPercentage * 0.01)
+                    + Utils.roundOffDecimal(SAMPLE_PRODUCT_B.price * DISCOUNT_B.discountInPercentage * 0.01 * 2)
+        )
+        val expectedTotalPrice = Utils.roundOffDecimal(
+            Utils.roundOffDecimal(SAMPLE_PRODUCT_A.price * 1) - Utils.roundOffDecimal(SAMPLE_PRODUCT_A.price * DISCOUNT_A.discountInPercentage * 0.01)
+                    + Utils.roundOffDecimal(SAMPLE_PRODUCT_B.price * 5) - Utils.roundOffDecimal(SAMPLE_PRODUCT_B.price * DISCOUNT_B.discountInPercentage * 0.01 * 2)
+        )
         response
             .then()
             .statusCode(200)
             .body(
                 "items.size()", `is`(2),
-                "totalPriceBeforeDiscount.toString()", `is`(totalPriceBeforeDiscount.toString()),
-                "totalDiscount.toString()", `is`(totalDiscount.toString()),
-                "totalPrice.toString()", `is`((totalPriceBeforeDiscount - totalDiscount).toString())
+                "totalPriceBeforeDiscount.toString()", `is`(expectedTotalPriceBeforeDiscount.toString()),
+                "totalDiscount.toString()", `is`(expectedTotalDiscount.toString()),
+                "totalPrice.toString()", `is`(expectedTotalPrice.toString())
             )
     }
 
@@ -131,7 +140,6 @@ class BasketControllerIntegrationTest {
 
         val SAMPLE_PRODUCT_A = Product("product-a", "Product A", null, 5.99)
         val SAMPLE_PRODUCT_B = Product("product-b", "Product B", "Product B Description", 699.99)
-
         val SAMPLE_BASKET = basketBuilder
             .setProductCount(
                 mutableMapOf(
@@ -148,12 +156,11 @@ class BasketControllerIntegrationTest {
             .setDescription("20% off on all product A")
             .build()
             .toDomain()
-
         val DISCOUNT_B = createDiscountDtoBuilder
             .setId("product-b")
             .setProductCount(2)
             .setDiscountInPercentage(10)
-            .setDescription("20% off on all product A")
+            .setDescription("Buy 2 get the second one 10% off")
             .build()
             .toDomain()
     }

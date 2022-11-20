@@ -3,6 +3,7 @@ package com.bullish.checkout.domain.service
 import com.bullish.checkout.adapters.output.repository.InMemoryBasketRepositoryImpl
 import com.bullish.checkout.adapters.output.repository.InMemoryDiscountRepositoryImpl
 import com.bullish.checkout.adapters.output.repository.InMemoryProductRepositoryImpl
+import com.bullish.checkout.domain.Utils
 import com.bullish.checkout.domain.models.Discount
 import com.bullish.checkout.domain.models.Product
 import com.bullish.checkout.domain.models.Receipt
@@ -22,6 +23,10 @@ class CheckoutService @Inject constructor(
         val items: List<ReceiptItem> =
             basket.productCount.entries.mapNotNull { entry -> mapToReceiptItem(entry.key, entry.value) }
 
+        return translateItemsToReceipt(items)
+    }
+
+    private fun translateItemsToReceipt(items: List<ReceiptItem>): Receipt {
         var totalPriceBeforeDiscount = 0.00
         var totalDiscount = 0.00
         var totalPrice = 0.00
@@ -35,24 +40,24 @@ class CheckoutService @Inject constructor(
 
         return Receipt(
             items = items,
-            totalPriceBeforeDiscount = totalPriceBeforeDiscount,
-            totalDiscount = totalDiscount,
-            totalPrice = totalPrice
+            totalPriceBeforeDiscount = Utils.roundOffDecimal(totalPriceBeforeDiscount),
+            totalDiscount = Utils.roundOffDecimal(totalDiscount),
+            totalPrice = Utils.roundOffDecimal(totalPrice)
         )
     }
 
     private fun mapToReceiptItem(productId: String, count: Int): ReceiptItem? {
         val product = getProduct(productId) ?: return null
-        val priceBeforeDiscount = product.price * count
         val discount = getProductDiscount(productId)
-        val calculatedDiscount = calculateDiscount(product.price, discount, count)
+        val priceBeforeDiscount = Utils.roundOffDecimal(product.price * count)
+        val calculatedDiscount = Utils.roundOffDecimal(calculateDiscount(product.price, discount, count))
 
         return ReceiptItem(
             product = product.name,
             priceBeforeDiscount = priceBeforeDiscount,
             discount = calculatedDiscount,
             discountDescription = discount?.description,
-            totalPrice = priceBeforeDiscount - calculatedDiscount
+            totalPrice = Utils.roundOffDecimal(priceBeforeDiscount - calculatedDiscount)
         )
     }
     private fun getProduct(productId: String): Product? {
