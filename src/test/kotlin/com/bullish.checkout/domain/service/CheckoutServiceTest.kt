@@ -19,8 +19,8 @@ class CheckoutServiceTest {
     private val basketBuilder: BasketBuilder = BasketBuilder()
     private val checkoutService: CheckoutService = CheckoutService(basketRepositoryImpl, productRepositoryImpl)
 
-    @BeforeEach
-    fun setUpBeforeEach() {
+    @BeforeAll
+    fun setUp() {
         MockKAnnotations.init(this)
         every { productRepositoryImpl.getByProductId(PRODUCT_A.id) } returns PRODUCT_A
         every { productRepositoryImpl.getByProductId(PRODUCT_B.id) } returns PRODUCT_B
@@ -34,12 +34,15 @@ class CheckoutServiceTest {
             .build()
     }
 
+    @BeforeEach
+    fun setUpBeforeEach() {}
+
     @Test
     fun `should be able to checkout without discounts`() {
         //when
         val actual = checkoutService.checkout()
         //then
-        Assertions.assertEquals(PRODUCT_A.price * 5 + PRODUCT_B.price * 1, actual)
+        Assertions.assertEquals(PRODUCT_A.price * 5 + PRODUCT_B.price * 1, actual.price)
         verify(exactly = 1) { basketRepositoryImpl.getBasket() }
     }
 

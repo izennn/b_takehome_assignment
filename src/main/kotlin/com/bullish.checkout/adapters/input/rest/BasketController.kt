@@ -2,6 +2,7 @@ package com.bullish.checkout.adapters.input.rest
 
 import com.bullish.checkout.adapters.input.rest.dto.UpdateBasketDto
 import com.bullish.checkout.domain.models.Basket
+import com.bullish.checkout.domain.models.Receipt
 import com.bullish.checkout.domain.service.BasketService
 import com.bullish.checkout.domain.service.CheckoutService
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody
@@ -25,8 +26,10 @@ class BasketController @Inject constructor(
 
     @GET
     @Path("/checkout")
-    fun checkout() {
+    @Produces(MediaType.APPLICATION_JSON)
+    fun checkout(): Receipt {
         logger.info("action=checking out basket, calculating price")
+        return checkoutService.checkout()
     }
 
     companion object {
