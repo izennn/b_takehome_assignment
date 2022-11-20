@@ -7,6 +7,5 @@ data class Discount (
     val productId: String,
     val productCount: Int,
     val discountInPercentage: Int? = null,
-    val discountInPrice: Double? = null,
     val description: String? = null
 )

@@ -15,7 +15,7 @@ class DiscountController @Inject constructor(
     @Consumes(MediaType.APPLICATION_JSON)
     fun addDiscount(@RequestBody createDiscountDto: CreateDiscountDto) {
         val discount = createDiscountDto.toDomain()
-        return discountService.createDiscount(discount)
+        discountService.createDiscount(discount)
     }
 
     @DELETE

@@ -21,21 +21,19 @@ class CreateDiscountDtoBuilder {
         return this
     }
 
-    fun setDiscountInPrice(price: Double): CreateDiscountDtoBuilder {
-        dto.discountInPrice = price
-        return this
-    }
-
     fun setDescription(description: String): CreateDiscountDtoBuilder {
         dto.description = description
         return this
+    }
+
+    fun build(): CreateDiscountDto {
+        return dto
     }
 
     private fun default() = CreateDiscountDto(
         id = "sample-product-id",
         productCount = 1,
         discountInPercentage = 10,
-        discountInPrice = null,
         description = null
     )
 }
