@@ -77,11 +77,35 @@ class CheckoutServiceTest {
     }
 
     @Test
-    fun `should be able to checkout, with one discount and that discount is reoccurring`() {
-    }
+    fun `should be able to checkout, with more than one discount and one of the discount is applied more than once`() {
+        //given
+        every { basketRepositoryImpl.getBasket() } returns basketBuilder
+            .setProductCount(
+                mutableMapOf(
+                    PRODUCT_A.id to 5,
+                    PRODUCT_B.id to 1,
+                    PRODUCT_C.id to 10,
+                )
+            )
+            .build()
+        every { discountRepositoryImpl.getDiscount(PRODUCT_C.id) } returns discountDtoBuilder
+            .setId(PRODUCT_C.id)
+            .setProductCount(3)
+            .setDiscountInPercentage(50)
+            .setDescription("Buy 3, get the 3rd 50 percent off")
+            .build()
+            .toDomain()
 
-    @Test
-    fun `should be able to checkout, with multiple discounts`() {
+        //when
+        val actual = checkoutService.checkout()
+
+        //then
+        val expectedPrice = (
+                PRODUCT_A.price * 5 - (PRODUCT_A.price * DISCOUNT_A.discountInPercentage * 0.01 * 5.floorDiv(DISCOUNT_A.productCount))
+                        + PRODUCT_B.price * 1
+                        + PRODUCT_C.price * 10 - (PRODUCT_C.price * 50 * 0.01 * 10.floorDiv(3))
+                )
+        Assertions.assertEquals(expectedPrice, actual.price)
     }
 
     companion object {
